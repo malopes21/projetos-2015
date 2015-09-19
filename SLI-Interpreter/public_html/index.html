@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SLI - Interpreter</title>
+        <link rel="icon" href="sli.png" />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="main.js"></script>
+    </head>
+    <body>
+        <div>
+            <table>
+                <tr>
+                    <td>
+                        <textarea id="codigo" rows="50" cols="80">
+( intero n fat i )
+( stampa "Entre n: " )
+( entrare n )
+( = fat 1 )
+( = i 1 )
+( mentre ( >= n i )
+    ( = fat ( * fat i ) )
+    ( = i ( + i 1 ) )
+)
+( stampa ( . "Fat= " fat ) )
+
+                        </textarea>
+                    </td>
+                    <td>
+                        <textarea id="saida" rows="50" cols="80" >
+                        </textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="button" id="iniciar" onclick="main();"  value="Iniciar" /></td>
+                    <td></td>
+                </tr>
+            </table>
+            
+        </div>
+    </body>
+</html>

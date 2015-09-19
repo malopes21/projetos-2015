@@ -1,0 +1,67 @@
+"Name"     = 'Enter the name of the grammar'
+"Author"   = 'Enter your name'
+"Version"  = 'The version of the grammar and/or language'
+"About"    = 'A short description of the grammar'
+
+"Start Symbol" = <List_Coman>
+
+! -------------------------------------------------
+! Character Sets
+! -------------------------------------------------
+
+{String Chars} = {Printable} + {HT} - ["]
+
+! -------------------------------------------------
+! Terminals
+! -------------------------------------------------
+
+id    = {Letter}{AlphaNumeric}*
+cls = '"' {String Chars}* '"'
+cli = {Digit}{Digit}*
+clr = {Digit}{Digit}* '.' {Digit}{Digit}*
+
+! -------------------------------------------------
+! Rules
+! -------------------------------------------------
+
+! The grammar starts below
+<List_Coman> ::= <Coman> <List_Coman> |
+              
+<Coman> ::= '(' <Coman_Inter> ')'
+         
+<Coman_Inter> ::= <Atrib> | <Decl> | <Escrita> | <Leitura> | <Laco> | <Cond> | <List_Coman>
+               
+<Decl> ::= <Tipo> <List_Id>
+        
+<Tipo> ::= 'intero' | 'vero' | 'corda' | 'booleano'
+        
+<List_Id> ::= id <List_Id2>
+           
+<List_Id2> ::= id <List_Id2> |
+            
+<Atrib> ::= '=' id <Expr_Arit> 
+         
+<Expr_Arit> ::= <Operan> | '(' <Op_Arit> <Expr_Arit> <Expr_Arit> ')'
+             
+<Operan> ::= id | cli | cls | clr
+          
+<Op_Arit> ::= '+' | '-' | '*' | '/' | '.'
+           
+<Escrita> ::= 'stampa' <Expr_Arit>
+           
+<Leitura> ::= 'entrare' id
+           
+<Laco> ::= 'mentre' <Expr_Log> <List_Coman>
+        
+<Expr_Log> ::= '(' <Op_Log> <Expr_Log> <Expr_Log> ')' | <Expr_Rel>
+            
+<Op_Log> ::= '&&' | '||'
+          
+<Expr_Rel> ::= '(' <Op_Rel> <Expr_Arit> <Expr_Arit> ')'
+            
+<Op_Rel> ::= '>' | '<' | '<=' | '>=' | '==' | '!='
+          
+<Cond> ::= 'si' <Expr_Log> <Coman> <Senao>
+         
+<Senao> ::= <Coman> |
+           
