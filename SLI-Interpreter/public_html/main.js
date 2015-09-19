@@ -182,6 +182,26 @@ function AnalisadorLexico(codigo){
     };
 };
 
+//classe do No da AST
+function No(tipo, token) {
+    
+    this.pai;
+    this.filhos = new Array();
+    this.tipo = tipo;
+    this.token = token;
+    
+    No.prototype.getFilho = function(pos) {
+        return this.filhos[pos];
+    };
+    
+    No.prototype.addFilho = function(no){
+        this.filhos.push(no);
+        no.pai = this;
+    };
+    
+};
+
+//classe do Analisador Sintatico (ASRP)
 function AnalisadorSintatico(tokens) {
     
     this.token = "";

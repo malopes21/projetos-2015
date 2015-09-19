@@ -182,6 +182,10 @@ function AnalisadorLexico(codigo){
     };
 };
 
+function No() {
+    
+};
+
 function AnalisadorSintatico(tokens) {
     
     this.token = "";
