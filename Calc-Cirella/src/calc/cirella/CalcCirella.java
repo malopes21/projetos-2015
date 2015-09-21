@@ -44,12 +44,15 @@ public class CalcCirella {
         valores.add(new Valor("---/2015",  5000.0, "corretagem"));
         
         double total = valores.get(0).getValor();
+        System.out.println(valores.get(0));
+        
         for(int i=1; i<valores.size(); i++) {
             Valor valor = valores.get(i);
             total = total + valor.getValor();
             total = total + total * 0.005;
+            System.out.println(valor);
         }
-        System.out.printf("Total: %9.2f", total);
+        System.out.printf("Total: %9.2f\n", total);
     }
 
 }
