@@ -198,6 +198,14 @@ function No(tipo, token) {
         this.filhos.push(no);
         no.pai = this;
     };
+    
+    No.prototype.toString = function() {
+        if(typeof this.token === "undefined" ||  this.token === null) {
+            return this.tipo;
+        } else {
+            return "[" + this.token.imagem + "]";
+        }
+    };
 };
 
 //classe do Analisador Sintatico (ASRP)
@@ -225,6 +233,19 @@ function AnalisadorSintatico(tokens) {
     AnalisadorSintatico.prototype.leToken = function() {
         this.token = this.tokens[this.pToken];
         this.pToken++;
+    };
+    
+    AnalisadorSintatico.prototype.mostraArvore = function() {
+        document.getElementById("saida").value = document.getElementById("saida").value + "\nAST: -------------------";
+        this.mostraNo(this.raiz, "");
+    };
+    
+    AnalisadorSintatico.prototype.mostraNo = function(no, espac) {
+        document.getElementById("saida").value = document.getElementById("saida").value 
+                    + "\n" + espac + no.toString();
+        for(var i=0; i<no.filhos.length; i++) {
+            this.mostraNo(no.filhos[i], espac + "   ");
+        }
     };
     
     AnalisadorSintatico.prototype.analisar = function() {
@@ -565,6 +586,6 @@ function main() {
         return;
     }
     
-    window.alert("SUCESSO!");
     analisadorSintatico.mostraArvore();
+    window.alert("SUCESSO!");
 }
