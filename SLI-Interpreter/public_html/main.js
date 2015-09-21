@@ -190,15 +190,14 @@ function No(tipo, token) {
     this.tipo = tipo;
     this.token = token;
     
-    No.prototype.getFilho = function(pos) {
+    No.prototype.get = function(pos) {
         return this.filhos[pos];
     };
     
-    No.prototype.addFilho = function(no){
+    No.prototype.add = function(no){
         this.filhos.push(no);
         no.pai = this;
     };
-    
 };
 
 //classe do Analisador Sintatico (ASRP)
@@ -208,6 +207,7 @@ function AnalisadorSintatico(tokens) {
     this.tokens = tokens;
     this.erros = new Array();
     this.pToken = 0;
+    this.raiz;
     
     AnalisadorSintatico.prototype.temErros = function () {
         return this.erros.length !== 0;
@@ -230,7 +230,7 @@ function AnalisadorSintatico(tokens) {
     AnalisadorSintatico.prototype.analisar = function() {
         this.pToken = 0;
         this.leToken();
-        this.ListComan();
+        this.raiz = this.ListComan();
         if(this.token.imagem !== "$") {
             this.erros.push("Esperado EOF.");
         }
@@ -238,18 +238,23 @@ function AnalisadorSintatico(tokens) {
     
     //<List_Coman> ::= <Coman> <List_Coman> |
     AnalisadorSintatico.prototype.ListComan = function() {
+        var no = new No("ListComan", null);
         if(this.token.imagem === "(") {
-            this.Coman();
-            this.ListComan();
+            no.add(this.Coman());
+            no.add(this.ListComan());
         }
+        return no;
     };
               
     //<Coman> ::= '(' <Coman_Inter> ')'
     AnalisadorSintatico.prototype.Coman = function() {
+        var no = new No("Coman", null);
         if(this.token.imagem === "(") {
+            no.add(new No("Token", this.token));
             this.leToken();
-            this.ComanInter();
+            no.add(this.ComanInter());
             if(this.token.imagem === ")") {
+                no.add(new No("Token", this.token));
                 this.leToken();
             } else {
                 this.erros.push("Esperado ')'. Token atual: "+this.token.toString());
@@ -257,88 +262,108 @@ function AnalisadorSintatico(tokens) {
         } else {
             this.erros.push("Esperado '('. Token atual: "+this.token.toString());
         }
+        return no;
     };     
          
     //<Coman_Inter> ::=  <Decl> | <Atrib> | <Escrita> | <Leitura> | <Laco> | <Cond> | <List_Coman>
      AnalisadorSintatico.prototype.ComanInter = function() {
+         var no = new No("ComanInter");
         if(this.token.imagem === "intero" || this.token.imagem === "vero" || this.token.imagem === "corda" || this.token.imagem === "booleano") {
-            this.Decl();
+            no.add(this.Decl());
         } else if(this.token.imagem === "=") {
-            this.Atrib();
+            no.add(this.Atrib());
         } else if(this.token.imagem === "stampa") {
-            this.Escrita();
+            no.add(this.Escrita());
         } else if(this.token.imagem === "entrare") {
-            this.Leitura();
+            no.add(this.Leitura());
         } else if(this.token.imagem === "mentre") {
-            this.Laco();
+            no.add(this.Laco());
         } else if(this.token.imagem === "si") {
-            this.Cond();
+            no.add(this.Cond());
         } else if(this.token.imagem === "(") {
-            this.ListComan();
+            no.add(this.ListComan());
         } else {
             this.erros.push("Esperado '=', 'intero', 'vero', 'corda', 'booleano', 'stampa', 'estrare', 'mentre', 'si' ou '('. Token atual: "+this.token.toString());
         }
+        return no;
      };
                
     //<Decl> ::= <Tipo> <List_Id>
     AnalisadorSintatico.prototype.Decl = function() {
-        this.Tipo();
-        this.ListId();
+        var no = new No("Decl", null);
+        no.add(this.Tipo());
+        no.add(this.ListId());
+        return no;
     };
         
     //<Tipo> ::= 'intero' | 'vero' | 'corda' | 'booleano'
     AnalisadorSintatico.prototype.Tipo = function() {
+        var no = new No("Tipo", null);
         if(this.token.imagem === "intero" || this.token.imagem === "vero" || this.token.imagem === "corda" || this.token.imagem === "booleano") {
+            no.add(new No("Token", this.token));
             this.leToken();
         } else {
             this.erros.push("Esperado intero', 'vero', 'corda' ou 'booleano'. Token atual: "+this.token.toString());
         }
+        return no;
     };
         
     //<List_Id> ::= id <List_Id2>
     AnalisadorSintatico.prototype.ListId = function() {
+        var no = new No("ListId", null);
         if(this.token.classe === "ID") {
+            no.add(new No("Token", this.token));
             this.leToken();
-            this.ListId2();
+            no.add(this.ListId2());
         } else {
             this.erros.push("Esperado ID. Token atual: "+this.token.toString());
         }
+        return no;
     };
            
     //<List_Id2> ::= id <List_Id2> |
     AnalisadorSintatico.prototype.ListId2 = function() {
+        var no = new No("ListId2");
         if(this.token.classe === "ID") {
+            no.add(new No("Token", this.token));
             this.leToken();
-            this.ListId2();
+            no.add(this.ListId2());
         } 
+        return no;
     };
             
     //<Atrib> ::= '=' id <Expr_Arit> 
     AnalisadorSintatico.prototype.Atrib = function() {
+        var no = new No("Atrib", null);
         if(this.token.imagem === "=") {
+            no.add(new No("Token", this.token));
             this.leToken();
             if(this.token.classe === "ID") {
+                no.add(new No("Token", this.token));
                 this.leToken();
-                this.ExprArit();
+                no.add(this.ExprArit());
             } else {
                 this.erros.push("Esperado ID. Token atual: "+this.token.toString());
             }
         } else {
             this.erros.push("Esperado '='. Token atual: "+this.token.toString());
         }
-       
+        return no;
     };
          
     //<Expr_Arit> ::= <Operan> | '(' <Op_Arit> <Expr_Arit> <Expr_Arit> ')'
     AnalisadorSintatico.prototype.ExprArit = function() {
+        var no = new No("ExprArit");
         if(this.token.classe === "ID" || this.token.classe === "CLI" || this.token.classe === "CLR" || this.token.classe === "CLS") {
-            this.Operan();
+            no.add(this.Operan());
         } else if(this.token.imagem === "(") {
+            no.add(new No("Token", this.token));
             this.leToken();
-            this.OpArit();
-            this.ExprArit();
-            this.ExprArit();
+            no.add(this.OpArit());
+            no.add(this.ExprArit());
+            no.add(this.ExprArit());
             if(this.token.imagem === ")") {
+                no.add(new No("Token", this.token));
                 this.leToken();
             } else {
                 this.erros.push("Esperado ')'. Token atual: "+this.token.toString());
@@ -346,41 +371,54 @@ function AnalisadorSintatico(tokens) {
         } else {
             this.erros.push("Esperado ID, CLI, CLR, CLS ou '('. Token atual: "+this.token.toString());
         }
+        return no;
     };         
              
     //<Operan> ::= id | cli | cls | clr
     AnalisadorSintatico.prototype.Operan = function() {
+        var no = new No("Operan", null);
         if(this.token.classe === "ID" || this.token.classe === "CLI" || this.token.classe === "CLR" || this.token.classe === "CLS") {
+            no.add(new No("Token", this.token));
             this.leToken();
         } else {
             this.erros.push("Esperado ID, CLI, CLR ou CLS. Token atual: "+this.token.toString());
         }
+        return no;
     };
     
     //<Op_Arit> ::= '+' | '-' | '*' | '/' | '.'
      AnalisadorSintatico.prototype.OpArit = function() {
+         var no = new No("OpArit", null);
         if(this.token.imagem === "+" || this.token.imagem === "-" || this.token.imagem === "*" || this.token.imagem === "/" || this.token.imagem === "." ) {
+            no.add(new No("Token", this.token));
             this.leToken();
         } else {
             this.erros.push("Esperado '+', '-', '*', '/' ou '.'. Token atual: "+this.token.toString());
         }
+        return no;
     };
     
     //<Escrita> ::= 'stampa' <Expr_Arit>
     AnalisadorSintatico.prototype.Escrita = function() {
+        var no = new No("Escrita", null);
         if(this.token.imagem === "stampa") {
+            no.add(new No("Token", this.token));
             this.leToken();
-            this.ExprArit();
+            no.add(this.ExprArit());
         } else {
             this.erros.push("Esperado 'stampa'. Token atual: "+this.token.toString());
         }
+        return no;
     };       
            
     //<Leitura> ::= 'entrare' id
     AnalisadorSintatico.prototype.Leitura = function() {
+        var no = new No("Leitura", null);
         if(this.token.imagem === "entrare") {
+            no.add(new No("Token", this.token));
             this.leToken();
             if(this.token.classe === "ID") {
+                no.add(new No("Token", this.token));
                 this.leToken();
             } else {
                 this.erros.push("Esperado ID. Token atual: "+this.token.toString());
@@ -388,17 +426,21 @@ function AnalisadorSintatico(tokens) {
         } else {
             this.erros.push("Esperado 'entrare'. Token atual: "+this.token.toString());
         }
+        return no;
     };
            
     //<Laco> ::= 'mentre' <Expr_Log> <List_Coman>
     AnalisadorSintatico.prototype.Laco = function() {
+        var no = new No("Laco", null);
         if(this.token.imagem === "mentre") {
+            no.add(new No("Token", this.token));
             this.leToken();
-            this.ExprLog();
-            this.ListComan();
+            no.add(this.ExprLog());
+            no.add(this.ListComan());
         } else {
             this.erros.push("Esperado 'mentre'. Token atual: "+this.token.toString());
         }
+        return no;
     };
         
     //metodo lookAhead para resolver a duvida do metodo ExprLog
@@ -408,29 +450,33 @@ function AnalisadorSintatico(tokens) {
         
     //<Expr_Log> ::= '(' <Op_Log> <Expr_Log> <Expr_Log> ')' | <Expr_Rel>
     AnalisadorSintatico.prototype.ExprLog = function() {
+        var no = new No("ExprLog", null);
         var ahead = this.lookAhead();
         if(this.token.imagem === "(") {
             if(ahead === "&&" || ahead === "||") {
+                no.add(new No("Token", this.token));
                 this.leToken(); //lendo o '('
-                this.OpLog();
-                this.ExprLog();
-                this.ExprLog();
+                no.add(this.OpLog());
+                no.add(this.ExprLog());
+                no.add(this.ExprLog());
                 if(this.token.imagem === ")") {
+                    no.add(new No("Token", this.token));
                     this.leToken();
                 } else {
                     this.erros.push("Esperado ')'. Token atual: "+this.token.toString());
                 }
             } else {
-                this.ExprRel();
+                no.add(this.ExprRel());
             }
         } else {
             this.erros.push("Esperado '('. Token atual: "+this.token.toString());
         }
+        return no;
     };
             
     //<Op_Log> ::= '&&' | '||'
     AnalisadorSintatico.prototype.OpLog = function() {
-        if(ahead === "&&" || ahead === "||") {
+        if(this.token.imagem === "&&" || this.token.imagem === "||") {
             this.leToken(); 
         } else {
             this.erros.push("Esperado '&&' ou '||'. Token atual: "+this.token.toString());
@@ -439,12 +485,15 @@ function AnalisadorSintatico(tokens) {
           
     //<Expr_Rel> ::= '(' <Op_Rel> <Expr_Arit> <Expr_Arit> ')'
     AnalisadorSintatico.prototype.ExprRel = function() {
+        var no = new No("ExprRel", null);
         if(this.token.imagem === "(") {
+            no.add(new No("Token", this.token));
             this.leToken();
-            this.OpRel();
-            this.ExprArit();
-            this.ExprArit();
+            no.add(this.OpRel());
+            no.add(this.ExprArit());
+            no.add(this.ExprArit());
             if(this.token.imagem === ")") {
+                no.add(new No("Token", this.token));
                 this.leToken();
             } else {
                 this.erros.push("Esperado ')'. Token atual: "+this.token.toString());
@@ -452,40 +501,50 @@ function AnalisadorSintatico(tokens) {
         } else {
             this.erros.push("Esperado '('. Token atual: "+this.token.toString());
         }
+        return no;
     };
             
     //<Op_Rel> ::= '>' | '<' | '<=' | '>=' | '==' | '!='
     AnalisadorSintatico.prototype.OpRel = function() {
+        var no = new No("OpRel", null);
         if(this.token.imagem === ">" || this.token.imagem === "<" || this.token.imagem === "<=" || this.token.imagem === ">=" || this.token.imagem === "==" || this.token.imagem === "!=" ) {
+            no.add(new No("Token", this.token));
             this.leToken();
         } else {
             this.erros.push("Esperado '>', '<', '>=', '<=', '==' ou '!='. Token atual: "+this.token.toString());
         }
+        return no;
     };
           
     //<Cond> ::= 'si' <Expr_Log> <Coman> <Senao>
     AnalisadorSintatico.prototype.Cond = function() {
+        var no = new No("Cond", null);
         if(this.token.imagem === "si") {
+            no.add(new No("Token", this.token));
             this.leToken();
-            this.ExprLog();
-            this.Coman();
-            this.Senao();
+            no.add(this.ExprLog());
+            no.add(this.Coman());
+            no.add(this.Senao());
         } else {
             this.erros.push("Esperado 'si'. Token atual: "+this.token.toString());
         }
+        return no;
     };
          
     //<Senao> ::= <Coman> |
     AnalisadorSintatico.prototype.Senao = function() {
+        var no = new No("Senao", null);
         if(this.token.imagem === "(") {
-            this.Coman();
+            no.add(this.Coman());
         }
+        return no;
     };
     
 }
 
 //classe main do aplicativo
 function main() {
+    document.getElementById("saida").value = "";        //limpar a 'saida'
     var codigoFonte = document.getElementById("codigo").value;
     
     //Análise Léxica
@@ -508,6 +567,4 @@ function main() {
     
     window.alert("SUCESSO!");
     analisadorSintatico.mostraArvore();
-    
-    
 }

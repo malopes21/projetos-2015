@@ -470,6 +470,7 @@ function AnalisadorSintatico(tokens) {
 
 //classe main do aplicativo
 function main() {
+    document.getElementById("saida").innerHTML = "";
     var codigoFonte = document.getElementById("codigo").value;
     
     //Análise Léxica
