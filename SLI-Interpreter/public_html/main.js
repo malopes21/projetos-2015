@@ -2,7 +2,7 @@
 function TabelasEstaticas() {
     this.palavrasReservadas = ["intero", "vero", "corda", "si", "mentre", "stampa", "entrare", "booleano"];
     this.delimitadores = ["(", ")"];
-    this.operadores = ["+", "-", "*", "/", "<", ">", "<=", ">=", "==", "!=", "=", "."];
+    this.operadores = ["+", "-", "*", "/", "<", ">", "<=", ">=", "==", "!=", "=", ".", "&&", "||"];
     
     TabelasEstaticas.prototype.ehPalavraReservada = function (imagem){
         for(var i=0; i<this.palavrasReservadas.length; i++) {
@@ -124,8 +124,8 @@ function AnalisadorLexico(codigo){
     };
     
     AnalisadorLexico.prototype.analisar = function (){
-        var cli = new RegExp("^\\d\\d*$");
-        var clr = new RegExp("^\\d\\d*\\.\\d\\d*$");
+        var cli = new RegExp("^[+-]?\\d\\d*$");
+        var clr = new RegExp("^[+-]?\\d\\d*\\.\\d\\d*$");
         var id = new RegExp("^\\w(\\w|\\d)*$");
         var linhas = this.codigo.split("\n");
         for(var i=0; i<linhas.length; i++) {
@@ -134,7 +134,9 @@ function AnalisadorLexico(codigo){
             for(var j=0; j<lexemas.length; j++){
                 //console.log("lexema: "+lexemas[j]);
                 var imagem = lexemas[j];
-                if(imagem.length > 0 && imagem.charAt(0) === '"') {
+                if(imagem.length > 0 && imagem.charAt(0) === '#') {
+                    break;
+                } else if(imagem.length > 0 && imagem.charAt(0) === '"') {
                     //console.log("achei uma string!");
                     var linhaAtual = linhas[i].trim();
                     var inicio = linhaAtual.indexOf("\"");
@@ -288,7 +290,7 @@ function AnalisadorSintatico(tokens) {
          
     //<Coman_Inter> ::=  <Decl> | <Atrib> | <Escrita> | <Leitura> | <Laco> | <Cond> | <List_Coman>
      AnalisadorSintatico.prototype.ComanInter = function() {
-         var no = new No("ComanInter");
+        var no = new No("ComanInter");
         if(this.token.imagem === "intero" || this.token.imagem === "vero" || this.token.imagem === "corda" || this.token.imagem === "booleano") {
             no.add(this.Decl());
         } else if(this.token.imagem === "=") {
@@ -409,7 +411,7 @@ function AnalisadorSintatico(tokens) {
     
     //<Op_Arit> ::= '+' | '-' | '*' | '/' | '.'
      AnalisadorSintatico.prototype.OpArit = function() {
-         var no = new No("OpArit", null);
+        var no = new No("OpArit", null);
         if(this.token.imagem === "+" || this.token.imagem === "-" || this.token.imagem === "*" || this.token.imagem === "/" || this.token.imagem === "." ) {
             no.add(new No("Token", this.token));
             this.leToken();
@@ -474,7 +476,7 @@ function AnalisadorSintatico(tokens) {
         var no = new No("ExprLog", null);
         var ahead = this.lookAhead();
         if(this.token.imagem === "(") {
-            if(ahead === "&&" || ahead === "||") {
+            if(ahead.imagem === "&&" || ahead.imagem === "||") {
                 no.add(new No("Token", this.token));
                 this.leToken(); //lendo o '('
                 no.add(this.OpLog());
@@ -497,11 +499,14 @@ function AnalisadorSintatico(tokens) {
             
     //<Op_Log> ::= '&&' | '||'
     AnalisadorSintatico.prototype.OpLog = function() {
+        var no = new No("OpLog", null);
         if(this.token.imagem === "&&" || this.token.imagem === "||") {
+            no.add(new No("Token", this.token));
             this.leToken(); 
         } else {
             this.erros.push("Esperado '&&' ou '||'. Token atual: "+this.token.toString());
         }
+        return no;
     };
           
     //<Expr_Rel> ::= '(' <Op_Rel> <Expr_Arit> <Expr_Arit> ')'
