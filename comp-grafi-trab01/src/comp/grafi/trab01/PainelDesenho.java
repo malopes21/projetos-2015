@@ -22,8 +22,8 @@ public class PainelDesenho extends JPanel {
 
     private List<Geometria> geometrias = new ArrayList<>();
 
-    private final float realWidth = 100.0f;
-    private final float realHeight = 100.0f;
+    private float realWidth = 100.0f;
+    private float realHeight = 100.0f;
     private float centerX;
     private float centerY;
     private float tamPixel;
@@ -34,7 +34,7 @@ public class PainelDesenho extends JPanel {
     private void initgr() {
         Dimension d = getSize();
         tamPixel = Math.max(realWidth / (d.width - 1), realHeight / (d.height - 1));
-        centerX = d.width / 2;
+        centerX = d.width / 2 ;
         centerY = d.height / 2;
     }
 
@@ -102,4 +102,46 @@ public class PainelDesenho extends JPanel {
         this.geometrias = geometrias;
     }
 
+    public float getCenterX() {
+        return centerX;
+    }
+
+    public void setCenterX(float centerX) {
+        this.centerX = centerX;
+    }
+
+    public float getCenterY() {
+        return centerY;
+    }
+
+    public void setCenterY(float centerY) {
+        this.centerY = centerY;
+    }
+
+    public float getTamPixel() {
+        return tamPixel;
+    }
+
+    public void setTamPixel(float tamPixel) {
+        this.tamPixel = tamPixel;
+    }
+
+    public float getRealWidth() {
+        return realWidth;
+    }
+
+    public void setRealWidth(float realWidth) {
+        this.realWidth = realWidth;
+    }
+
+    public float getRealHeight() {
+        return realHeight;
+    }
+
+    public void setRealHeight(float realHeight) {
+        this.realHeight = realHeight;
+    }
+
+    
+    
 }

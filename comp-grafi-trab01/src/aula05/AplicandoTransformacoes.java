@@ -41,7 +41,7 @@ class CvAplicandoTransformacoes extends JPanel {
 	float rWidth = 100.0F;
 	float rHeight = 100.0F;
 
-	//inicia dimensoes do ambiente gráfico
+	//inicia dimensoes do ambiente grafico
 	void initgr() {
 		Dimension d = getSize();
 		int maxX = d.width - 1, maxY = d.height - 1;

@@ -2,7 +2,7 @@ package aula05;
 
 public class Transformacoes {
 	
-	//matriz de rotação R: 	P' = R * P
+	//matriz de rotacao R: 	P' = R * P
 	//	cos(ang) 	-sen(ang)	0
 	//	sen(ang)	cos(ang)	0
 	//	0			0			1

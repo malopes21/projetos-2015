@@ -53,6 +53,13 @@ public class Editor extends javax.swing.JFrame {
         txtDx = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         txtDy = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        txtZoom = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        txtDxCenter = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        txtDyCenter = new javax.swing.JTextField();
+        btnTrans1 = new javax.swing.JButton();
         jPanel2 = new PainelDesenho();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -105,6 +112,25 @@ public class Editor extends javax.swing.JFrame {
 
         txtDy.setText("10");
 
+        jLabel9.setText("Zoom:");
+
+        txtZoom.setText("1");
+
+        jLabel10.setText("DxCenter:");
+
+        txtDxCenter.setText("10");
+
+        jLabel11.setText("DyCenter:");
+
+        txtDyCenter.setText("10");
+
+        btnTrans1.setText("Aplicar Deslocamento e Zoom");
+        btnTrans1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTrans1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -127,31 +153,36 @@ public class Editor extends javax.swing.JFrame {
                             .addComponent(txtYs, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
                             .addComponent(txtId, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
                             .addComponent(btnCriar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addGap(27, 27, 27)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(28, 28, 28)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtGeometria, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel6)
-                                .addGap(18, 18, 18)
-                                .addComponent(comboTrans, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(115, 115, 115)
-                        .addComponent(btnTrans, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(27, 27, 27)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel8))
-                        .addGap(11, 11, 11)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtDy)
-                            .addComponent(txtDx))))
-                .addGap(271, 271, 271))
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel8))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(comboTrans, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtGeometria, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+                    .addComponent(txtDy, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(txtDx)
+                    .addComponent(btnTrans, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(27, 27, 27)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnTrans1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel10)
+                                .addComponent(jLabel9))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(txtZoom)
+                                .addComponent(txtDxCenter, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtDyCenter, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -161,18 +192,25 @@ public class Editor extends javax.swing.JFrame {
                     .addComponent(jLabel1)
                     .addComponent(txtXs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtGeometria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel9)
+                    .addComponent(txtZoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtYs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6)
-                    .addComponent(comboTrans, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(comboTrans, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel10)
+                    .addComponent(txtDxCenter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(txtDx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel7))
+                        .addComponent(jLabel7)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel11)
+                            .addComponent(txtDyCenter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel3)))
@@ -187,7 +225,8 @@ public class Editor extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCriar)
-                    .addComponent(btnTrans))
+                    .addComponent(btnTrans)
+                    .addComponent(btnTrans1))
                 .addGap(25, 25, 25))
         );
 
@@ -273,6 +312,21 @@ public class Editor extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnTransActionPerformed
 
+    private void btnTrans1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTrans1ActionPerformed
+        // TODO add your handling code here:
+        PainelDesenho pDes = (PainelDesenho) jPanel2;
+        float zoom = Float.parseFloat(txtZoom.getText());
+        pDes.setRealHeight(pDes.getRealHeight()/zoom);
+        pDes.setRealWidth(pDes.getRealWidth()/zoom);
+        
+        float dxCenter = Float.parseFloat(txtDxCenter.getText());
+        float dyCenter = Float.parseFloat(txtDyCenter.getText());
+        pDes.setCenterX(pDes.getCenterX() + dxCenter);
+        pDes.setCenterY(pDes.getCenterY() + dyCenter);
+        
+        pDes.repaint();
+    }//GEN-LAST:event_btnTrans1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -313,9 +367,12 @@ public class Editor extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCriar;
     private javax.swing.JButton btnTrans;
+    private javax.swing.JButton btnTrans1;
     private javax.swing.JComboBox comboCor;
     private javax.swing.JComboBox comboTrans;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -323,14 +380,18 @@ public class Editor extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField txtDx;
+    private javax.swing.JTextField txtDxCenter;
     private javax.swing.JTextField txtDy;
+    private javax.swing.JTextField txtDyCenter;
     private javax.swing.JTextField txtGeometria;
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtXs;
     private javax.swing.JTextField txtYs;
+    private javax.swing.JTextField txtZoom;
     // End of variables declaration//GEN-END:variables
 
     private void addGeometria(Geometria geometria) {
