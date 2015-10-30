@@ -42,7 +42,7 @@ function Simbolo(imagem) {
     this.valor = "";
     
     Simbolo.prototype.toString = function() {
-        return this.imagem + " " + this.tipo + " " + this.valor;
+        return this.imagem + " - " + this.tipo + " - " + this.valor;
     };
 }
 
@@ -68,10 +68,28 @@ function TabelaSimbolos() {
         }
         return -1;
     };
+    
+    TabelaSimbolos.prototype.getTipo = function(token){
+        if(token.classe === "ID") {
+            return this.simbolos[token.indice].tipo;
+        } else if(token.classe === "CLI") {
+            return "intero";
+        } else if(token.classe === "CLR") {
+            return "vero";
+        } else if(token.classe === "CLS") {
+            return "corda";
+        } else if(token.classe === "CLL") {
+            return "booleano";
+        } 
+    };
+    
+    TabelaSimbolos.prototype.setTipo = function(token, tipo){
+        this.simbolos[token.indice].tipo = tipo;
+    };
 }
 
 //objeto global para acesso a tabela de simbolos
-var tabelaSimbolos = new TabelaSimbolos();
+var tabelaSimbolos;
 
 //classe Token
 function Token(imagem, classe, indice, linha, coluna) {
@@ -568,8 +586,233 @@ function AnalisadorSintatico(tokens) {
     
 }
 
+function AnalisadorSemantico(raiz) {
+    this.raiz = raiz;
+    this.erros = new Array();
+    
+    AnalisadorSemantico.prototype.temErros = function () {
+        return this.erros.length !== 0;
+    };
+    
+    AnalisadorSemantico.prototype.mostraErros = function () {
+        var saida = document.getElementById("saida");
+        var conteudo = "\n";
+        for(var i=0; i<this.erros.length; i++) {
+            conteudo = conteudo + "Erro semântico: "+this.erros[i]+ "\n";
+        }
+        saida.value = saida.value + conteudo;
+    };
+    
+    AnalisadorSemantico.prototype.analisar = function() {
+        this.analisa(this.raiz);
+    };
+    
+    AnalisadorSemantico.prototype.analisa = function(no) {
+        switch (no.tipo) {
+            case "ListComan": return this.ListComan(no);
+            case "Coman": return this.Coman(no);
+            case "ComanInter": return this.ComanInter(no);        
+            case "Decl": return this.Decl(no);
+            case "Tipo": return this.Tipo(no);
+            case "ListId": return this.ListId(no);
+            case "ListId2": return this.ListId2(no);
+            case "Atrib": return this.Atrib(no);
+            case "ExprArit": return this.ExprArit(no);
+            case "Operan": return this.Operan(no);
+            case "OpArit": return this.OpArit(no);
+            case "Escrita": return this.Escrita(no);
+            case "Leitura": return this.Leitura(no);
+            case "Laco": return this.Laco(no);
+            case "ExprLog": return this.ExprLog(no);
+            case "OpLog": return this.OpLog(no);
+            case "ExprRel": return this.ExprRel(no);
+            case "OpRel": return this.OpRel(no);
+            case "Cond": return this.Cond(no);
+            case "Senao": return this.Senao(no);
+            case "Token": break;
+            default : throw new Error("Tipo de no nao existente! Método AnalisadorSemantico.analisa(no). No: "+no.toString());
+        }
+    };
+    
+    //<List_Coman> ::= <Coman> <List_Coman> |
+    AnalisadorSemantico.prototype.ListComan = function(no){
+        if(no.filhos.length > 0) {
+            this.analisa(no.get(0));
+            this.analisa(no.get(1));
+        }
+    };
+    
+    //<Coman> ::= '(' <Coman_Inter> ')'
+    AnalisadorSemantico.prototype.Coman = function(no) {
+        this.analisa(no.get(1));
+    };
+    
+    //<Coman_Inter> ::= <Atrib> | <Decl> | <Escrita> | <Leitura> | <Laco> | <Cond> | <List_Coman>
+    AnalisadorSemantico.prototype.ComanInter = function(no) {
+        this.analisa(no.get(0));
+    };
+    
+    //<Decl> ::= <Tipo> <List_Id>
+    AnalisadorSemantico.prototype.Decl = function(no) {
+        var tipo = this.analisa(no.get(0));
+        var listId = this.analisa(no.get(1));
+        for(var i=0; i<listId.length; i++) {
+            var id = listId[i];
+            if(tabelaSimbolos.getTipo(id) !== "") {
+                this.erros.push("Identificador redeclarado. Linha: " + id.linha +". Token: "+id.toString());
+            }
+            tabelaSimbolos.setTipo(id, tipo);
+        }
+    };
+    
+    //<Tipo> ::= 'intero' | 'vero' | 'corda' | 'booleano'
+    AnalisadorSemantico.prototype.Tipo = function(no){
+        return no.get(0).token.imagem;
+    };
+    
+    //<List_Id> ::= id <List_Id2>
+    AnalisadorSemantico.prototype.ListId = function(no) {
+        var id = no.get(0).token;
+        var listId2 = this.analisa(no.get(1));
+        listId2.unshift(id);
+        return listId2;
+    };
+    
+    //<List_Id2> ::= id <List_Id2> |
+    AnalisadorSemantico.prototype.ListId2 = function(no) {
+        if(no.filhos.length > 0) {
+            var id = no.get(0).token;
+            var listId2 = this.analisa(no.get(1));
+            listId2.unshift(id);
+            return listId2;
+        } else {
+            return new Array();
+        }
+    };
+    
+    //<Atrib> ::= '=' id <Expr_Arit> 
+    AnalisadorSemantico.prototype.Atrib = function(no) {
+        var id = no.get(1).token;
+        var tipoId = tabelaSimbolos.getTipo(id);
+        if(tabelaSimbolos.getTipo(id) === "") {
+            this.erros.push("Identificador não declarado. Linha: " + id.linha +". Token: "+id.toString());
+        } else {
+            var exprArit = this.analisa(no.get(2));
+            for(var i=0; i<exprArit.length; i++) {
+                var operan = exprArit[i];
+                var tipoOperan = tabelaSimbolos.getTipo(operan);
+                if( tipoOperan === "") {
+                    this.erros.push("Identificador não declarado. Linha: " + operan.linha +". Token: "+operan.toString());
+                } else if(tipoId !== tipoOperan) {
+                    this.erros.push("Tipo de operando incompatível com o tipo do id do lado esquerdo. Linha: " + operan.linha +". Token: "+operan.toString());
+                }
+            }
+        }
+    };
+    
+    //<Expr_Arit> ::= <Operan> | '(' <Op_Arit> <Expr_Arit> <Expr_Arit> ')'
+    AnalisadorSemantico.prototype.ExprArit = function(no) {
+        if(no.filhos.length === 1) {
+            var operan = this.analisa(no.get(0));
+            var array = new Array();
+            array.push(operan);
+            return array;
+        } else {
+            var exprArit1 = this.analisa(no.get(2));
+            var exprArit2 = this.analisa(no.get(3));
+            var opArit = this.analisa(no.get(1));
+            if(opArit.imagem === ".") {
+                return exprArit1.concat(exprArit2);
+            } else {
+                var tudo = exprArit1.concat(exprArit2);
+                var operan0 = tudo[0];
+                var tipoOperan0 = tabelaSimbolos.getTipo(operan0);
+                if(tipoOperan0 === "") {
+                    this.erros.push("Identificador não declarado. Linha: " + operan0.linha +". Token: "+operan0.toString());
+                } 
+                for(var i=1; i<tudo.length; i++) {
+                    var operan = tudo[i];
+                    var tipoOperan = tabelaSimbolos.getTipo(operan);
+                    if( tipoOperan === "") {
+                        achouErro = true;
+                        this.erros.push("Identificador não declarado. Linha: " + operan.linha +". Token: "+operan.toString());
+                    } if(tipoOperan !== tipoOperan0) {
+                        this.erros.push("Tipo de operando incompatível na expressao. Linha: " + operan.linha +". Token: "+operan.toString());
+                    }
+                }
+                return tudo;
+            }
+            
+        }
+    };
+    
+    //<Operan> ::= id | cli | cls | clr
+    AnalisadorSemantico.prototype.Operan = function(no) {
+        return no.get(0).token;
+    };      
+          
+    //<Op_Arit> ::= '+' | '-' | '*' | '/' | '.'
+    AnalisadorSemantico.prototype.OpArit = function(no) {
+        return no.get(0).token;
+    };
+           
+    //<Escrita> ::= 'stampa' <Expr_Arit>
+    AnalisadorSemantico.prototype.Escrita = function(no) {
+        var exprArit = this.analisa(no.get(1));
+        for(var i=0; i<exprArit.length; i++) {
+            var operan = exprArit[i];
+            var tipoOperan = tabelaSimbolos.getTipo(operan);
+            if( tipoOperan === "") {
+                this.erros.push("Identificador não declarado. Linha: " + operan.linha +". Token: "+operan.toString());
+            } 
+        }
+    };
+           
+    //<Leitura> ::= 'entrare' id
+    AnalisadorSemantico.prototype.Leitura = function(no) {
+        
+    };
+           
+    //<Laco> ::= 'mentre' <Expr_Log> <List_Coman>
+    AnalisadorSemantico.prototype.Laco = function(no) {
+        
+    };
+        
+    //<Expr_Log> ::= '(' <Op_Log> <Expr_Log> <Expr_Log> ')' | <Expr_Rel>
+    AnalisadorSemantico.prototype.ExprLog = function(no) {
+        
+    };
+            
+    //<Op_Log> ::= '&&' | '||'
+    AnalisadorSemantico.prototype.OpLog = function(no) {
+        
+    };
+          
+    //<Expr_Rel> ::= '(' <Op_Rel> <Expr_Arit> <Expr_Arit> ')'
+    AnalisadorSemantico.prototype.ExprRel = function(no) {
+        
+    };
+            
+    //<Op_Rel> ::= '>' | '<' | '<=' | '>=' | '==' | '!='
+    AnalisadorSemantico.prototype.OpRel = function(no) {
+        
+    };
+          
+    //<Cond> ::= 'si' <Expr_Log> <Coman> <Senao>
+    AnalisadorSemantico.prototype.Cond = function(no) {
+        
+    };
+         
+    //<Senao> ::= <Coman> |
+    AnalisadorSemantico.prototype.Senao = function(no) {
+        
+    };
+    
+}
+
 //classe main do aplicativo
 function main() {
+    tabelaSimbolos = new TabelaSimbolos();
     document.getElementById("saida").value = "";        //limpar a 'saida'
     var codigoFonte = document.getElementById("codigo").value;
     
@@ -592,5 +835,16 @@ function main() {
     }
     
     analisadorSintatico.mostraArvore();
+    
+    var analisadorSemantico = new AnalisadorSemantico(analisadorSintatico.raiz);
+    analisadorSemantico.analisar();
+    if(analisadorSemantico.temErros()) {
+        analisadorSemantico.mostraErros();
+        return;
+    }
+    
+    analisadorLexico.mostraSimbolos();
+    
+    document.getElementById("saida").scrollTop = 99999;  //rolar pro fim
     window.alert("SUCESSO!");
 }
