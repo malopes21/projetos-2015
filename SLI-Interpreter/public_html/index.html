@@ -13,38 +13,44 @@
             <table>
                 <tr>
                     <td>
-                        <textarea id="codigo" rows="50" cols="80">
+                        <textarea id="codigo" rows="40" cols="80">
 #prog01.sli - fatorial simples
 
 ( intero n fat i )      #declarando variaveis inteiras
 ( stampa "Entre n: " )
 ( entrare n )
-( = fat 1 )
-( = i 1 )
-( mentre ( >= n i )
-    ( = fat ( * fat i ) )
-    ( = i ( + i 1 ) )
-)
-( stampa ( . "Fat= " fat ) )
-
-#teste de comando condicional
-( si ( && ( > fat i ) ( > i 1 ) )
+( si ( >= n 0 )
     (
-        ( = n -35.40 )
-        ( = i 200.0 )
+        ( = fat 1 )
+        ( = i 1 )
+        ( mentre ( >= n i )
+            ( = fat ( * fat i ) )
+            ( = i ( + i 1 ) )
+        )
+        ( stampa ( . "\Fat= " fat ) )
     )
-    ( = i -400 )
+    ( stampa "\Valor inválido para n!" )
 )
+
                         </textarea>
                     </td>
                     <td>
-                        <textarea id="saida" rows="50" cols="80" >
+                        <textarea id="saida" rows="40" cols="80" >
                         </textarea>
                     </td>
                 </tr>
                 <tr>
-                    <td><input type="button" id="iniciar" onclick="main();"  value="Iniciar" /></td>
+                    <td>
+                        <input type="button" id="iniciar" onclick="main();"  value="Iniciar" />
+                        <input type="button" id="limpar" onclick="limpar();"  value="Limpar" />
+                    </td>
                     <td></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <textarea id="console" rows="12" cols="164" >
+                        </textarea>
+                    </td>
                 </tr>
             </table>
             

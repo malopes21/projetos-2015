@@ -1,10 +1,17 @@
-( intero n fat i )
+#prog01.sli - fatorial simples
+
+( intero n fat i )      #declarando variaveis inteiras
 ( stampa "Entre n: " )
 ( entrare n )
-( = fat 1 )
-( = i 1 )
-( mentre ( >= n i )
-    ( = fat ( * fat i ) )
-    ( = i ( + i 1 ) )
+( si ( >= n 0 )
+    (
+        ( = fat 1 )
+        ( = i 1 )
+        ( mentre ( >= n i )
+            ( = fat ( * fat i ) )
+            ( = i ( + i 1 ) )
+        )
+        ( stampa ( . "\Fat= " fat ) )
+    )
+    ( stampa "\Valor invalido para n!" )
 )
-( stampa ( . "Fat= " fat ) )
